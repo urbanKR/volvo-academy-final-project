@@ -9,6 +9,7 @@ namespace NewsAggregationPlatform.Models.Entities
     {
         public Guid UserId { get; set; }
         public Guid ArticleId { get; set; }
+        [Required]
         public bool Vote { get; set; }
         public User User { get; set; }
         public Article Article { get; set; }
