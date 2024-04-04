@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NewsAggregationPlatform.Data;
 using NewsAggregationPlatform.Models.Entities;
+using NewsAggregationPlatform.Services.Abstraction;
+using NewsAggregationPlatform.Services.Implementation;
 
 namespace NewsAggregationPlatform
 {
@@ -22,6 +24,9 @@ namespace NewsAggregationPlatform
                 options.User.RequireUniqueEmail = true;
             })
             .AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
+
+            builder.Services.AddScoped<IArticleService, ArticleService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
 
             builder.Services.AddControllersWithViews();
 

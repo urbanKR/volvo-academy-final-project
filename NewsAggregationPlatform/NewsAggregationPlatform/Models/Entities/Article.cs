@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NewsAggregationPlatform.Models.Entities
 {
@@ -24,12 +25,14 @@ namespace NewsAggregationPlatform.Models.Entities
         [Required]
         [DataType(DataType.Date)]
         public DateTime PublishedDate { get; set; }
+        [ForeignKey("User")]
         public Guid? CreatedByUserId { get; set; }
+        [ForeignKey("Category")]
         public Guid CategoryId { get; set; }
-        public User User { get; set; }
-        public Category Category { get; set; }
-        public ICollection<Comment> Comments { get; set; }
-        public ICollection<Rating> Ratings { get; set; }
-        public ICollection<UserPositivityLevel> PositivityLevels { get; set; }
+        public User? User { get; set; }
+        public Category? Category { get; set; }
+        public ICollection<Comment>? Comments { get; set; }
+        public ICollection<Rating>? Ratings { get; set; }
+        public ICollection<UserPositivityLevel>? PositivityLevels { get; set; }
     }
 }

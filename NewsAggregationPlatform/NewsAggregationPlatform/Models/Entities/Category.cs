@@ -8,6 +8,6 @@ namespace NewsAggregationPlatform.Models.Entities
         public Guid Id { get; set; }
         [Required]
         public string Name { get; set; }
-        public ICollection<Article> Articles { get; set; }
+        public ICollection<Article>? Articles { get; set; }
     }
 }
