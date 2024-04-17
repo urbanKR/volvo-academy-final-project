@@ -29,8 +29,11 @@ namespace NewsAggregationPlatform.Models.Entities
         public Guid? CreatedByUserId { get; set; }
         [ForeignKey("Category")]
         public Guid CategoryId { get; set; }
+        [ForeignKey("Source")]
+        public Guid? SourceId { get; set; }
         public User? User { get; set; }
         public Category? Category { get; set; }
+        public Source? Source { get; set; }
         public ICollection<Comment>? Comments { get; set; }
         public ICollection<Rating>? Ratings { get; set; }
         public ICollection<UserPositivityLevel>? PositivityLevels { get; set; }

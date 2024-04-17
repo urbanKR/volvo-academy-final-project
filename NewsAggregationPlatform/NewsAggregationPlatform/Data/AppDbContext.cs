@@ -17,6 +17,7 @@ namespace NewsAggregationPlatform.Data
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Rating> Ratings { get; set; }
         public DbSet<UserPositivityLevel> UserPositivityLevels { get; set; }
+        public DbSet<Source> Sources { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
