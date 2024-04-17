@@ -15,11 +15,11 @@ namespace NewsAggregationPlatform.Services.Implementation
         }
         public async Task<IEnumerable<Article>> GetArticlesAsync()
         {
-            return await _dbContext.Articles.Include(a => a.Category).ToListAsync();
+            return await _dbContext.Articles.Include(a => a.Category).Include(a => a.Source).ToListAsync();
         }
         public async Task<Article> GetArticleByIdAsync(Guid id)
         {
-            return await _dbContext.Articles.Include(a => a.Category).FirstOrDefaultAsync(a => a.Id == id);
+            return await _dbContext.Articles.Include(a => a.Category).Include(a => a.Source).FirstOrDefaultAsync(a => a.Id == id);
         }
         public bool AddArticle(Article article)
         {

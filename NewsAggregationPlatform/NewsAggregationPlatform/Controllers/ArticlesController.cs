@@ -16,10 +16,12 @@ namespace NewsAggregationPlatform.Controllers
     {
         private readonly IArticleService _articleService;
         private readonly ICategoryService _categoryService;
-        public ArticlesController(IArticleService articleService, ICategoryService categoryService)
+        private readonly ISourceService _sourceService;
+        public ArticlesController(IArticleService articleService, ICategoryService categoryService, ISourceService sourceService)
         {
             _articleService = articleService;
             _categoryService = categoryService;
+            _sourceService = sourceService;
         }
 
         public async Task<IActionResult> Index()
@@ -48,13 +50,20 @@ namespace NewsAggregationPlatform.Controllers
         public async Task<IActionResult> Create()
         {
             var categories = await _categoryService.GetCategoriesAsync();
+            var sources = await _sourceService.GetSourcesAsync();
             var categoryList = categories.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.Name
+            });
+            var sourceList = sources.Select(c => new SelectListItem
             {
                 Value = c.Id.ToString(),
                 Text = c.Name
             });
 
             ViewData["Categories"] = new SelectList(categoryList, "Value", "Text");
+            ViewData["Sources"] = new SelectList(sourceList, "Value", "Text");
 
             return View();
         }
@@ -90,13 +99,20 @@ namespace NewsAggregationPlatform.Controllers
                 return NotFound();
             }
             var categories = await _categoryService.GetCategoriesAsync();
+            var sources = await _sourceService.GetSourcesAsync();
             var categoryList = categories.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.Name
+            });
+            var sourceList = sources.Select(c => new SelectListItem
             {
                 Value = c.Id.ToString(),
                 Text = c.Name
             });
 
             ViewData["Categories"] = new SelectList(categoryList, "Value", "Text");
+            ViewData["Sources"] = new SelectList(sourceList, "Value", "Text");
             return View(article);
         }
 

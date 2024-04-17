@@ -27,6 +27,7 @@ namespace NewsAggregationPlatform
 
             builder.Services.AddScoped<IArticleService, ArticleService>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<ISourceService, SourceService>();
 
             builder.Services.AddControllersWithViews();
 
