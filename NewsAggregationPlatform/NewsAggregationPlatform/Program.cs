@@ -18,18 +18,30 @@ namespace NewsAggregationPlatform
             builder.Services.AddDbContext<AppDbContext>(options =>
                            options.UseSqlServer(connectionString));
 
-            builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
+            //builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<AppDbContext>();
+
+            builder.Services.AddDefaultIdentity<User>(options =>
             {
                 options.Password.RequiredLength = 8;
                 options.User.RequireUniqueEmail = true;
             })
-            .AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
+            .AddEntityFrameworkStores<AppDbContext>()
+            .AddDefaultTokenProviders();
+
+            //builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
+            //{
+            //    options.Password.RequiredLength = 8;
+            //    options.User.RequireUniqueEmail = true;
+            //})
+            //.AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
 
             builder.Services.AddScoped<IArticleService, ArticleService>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<ISourceService, SourceService>();
 
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddRazorPages();
 
             var app = builder.Build();
 
@@ -51,6 +63,8 @@ namespace NewsAggregationPlatform
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            app.MapRazorPages();
 
             app.Run();
         }
