@@ -18,22 +18,13 @@ namespace NewsAggregationPlatform
             builder.Services.AddDbContext<AppDbContext>(options =>
                            options.UseSqlServer(connectionString));
 
-            //builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<AppDbContext>();
-
-            builder.Services.AddDefaultIdentity<User>(options =>
+            builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
             {
                 options.Password.RequiredLength = 8;
                 options.User.RequireUniqueEmail = true;
+                options.SignIn.RequireConfirmedEmail = false;
             })
-            .AddEntityFrameworkStores<AppDbContext>()
-            .AddDefaultTokenProviders();
-
-            //builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
-            //{
-            //    options.Password.RequiredLength = 8;
-            //    options.User.RequireUniqueEmail = true;
-            //})
-            //.AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
+            .AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders().AddDefaultUI();
 
             builder.Services.AddScoped<IArticleService, ArticleService>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -58,6 +49,8 @@ namespace NewsAggregationPlatform
 
             app.UseRouting();
 
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(

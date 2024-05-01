@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NewsAggregationPlatform.Models.Entities;
@@ -6,6 +7,7 @@ using NewsAggregationPlatform.Services.Abstraction;
 
 namespace NewsAggregationPlatform.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class SourcesController : Controller
     {
         private readonly ISourceService _sourceService;
