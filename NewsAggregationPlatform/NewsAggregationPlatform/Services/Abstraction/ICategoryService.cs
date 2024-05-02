@@ -6,6 +6,7 @@ namespace NewsAggregationPlatform.Services.Abstraction
     {
         Task<IEnumerable<Category>> GetCategoriesAsync();
         Task<Category> GetCategoryByIdAsync(Guid id);
+        Task<Category> GetCategoryByNameAsync(String name);
         bool AddCategory(Category category);
         bool UpdateCategory(Category category);
         bool DeleteCategory(Category category);

@@ -21,6 +21,10 @@ namespace NewsAggregationPlatform.Services.Implementation
         {
             return await _dbContext.Categories.Include(c => c.Articles).FirstOrDefaultAsync(c => c.Id == id);
         }
+        public async Task<Category> GetCategoryByNameAsync(String name)
+        {
+            return await _dbContext.Categories.Include(c => c.Articles).FirstOrDefaultAsync(c => c.Name == name);
+        }
         public bool AddCategory(Category category)
         {
             _dbContext.Categories.Add(category);

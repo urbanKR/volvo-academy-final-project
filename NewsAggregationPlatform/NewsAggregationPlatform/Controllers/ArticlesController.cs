@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel.Syndication;
 using System.Threading.Tasks;
+using System.Xml;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -185,6 +187,16 @@ namespace NewsAggregationPlatform.Controllers
                 return true;
             }
             return false;
+        }
+
+        public async Task<IActionResult> Aggregate()
+        {
+            var rssLink = "https://www.espn.com/espn/rss/soccer/news";
+            var category = await _categoryService.GetCategoryByNameAsync("Sport");
+            var source = await _sourceService.GetSourceByNameAsync("ESPN");
+            await _articleService.AggregateFromSourceAsync(rssLink, category.Id, source.Id);  
+            
+            return RedirectToAction("Index");
         }
     }
 }

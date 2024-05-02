@@ -41,5 +41,10 @@ namespace NewsAggregationPlatform.Services.Implementation
             var changes = _dbContext.SaveChanges();
             return changes > 0;
         }
+
+        public async Task<Source> GetSourceByNameAsync(string name)
+        {
+            return await _dbContext.Sources.Include(c => c.Articles).FirstOrDefaultAsync(s => s.Name == name);
+        }
     }
 }

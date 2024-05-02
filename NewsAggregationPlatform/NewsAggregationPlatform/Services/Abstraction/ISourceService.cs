@@ -10,5 +10,6 @@ namespace NewsAggregationPlatform.Services.Abstraction
         bool UpdateSource(Source source);
         bool DeleteSource(Source source);
         bool Save();
+        Task<Source> GetSourceByNameAsync(string name);
     }
 }
