@@ -10,6 +10,6 @@ namespace NewsAggregationPlatform.Services.Abstraction
         bool UpdateArticle(Article article);
         bool DeleteArticle(Article article);
         bool Save();
-        Task AggregateFromSourceAsync(string rssLink, Guid categoryId, Guid sourceId);
+        Task AggregateFromSourceAsync(string rssLink, CancellationToken cancellationToken);
     }
 }

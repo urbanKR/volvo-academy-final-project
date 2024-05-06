@@ -14,9 +14,8 @@ namespace NewsAggregationPlatform.Models.Entities
         [Required]
         [MaxLength(700)]
         public string Description { get; set; }
-        [Required]
         [MaxLength(10000)]
-        public string Content { get; set; }
+        public string? Content { get; set; }
         [Required]
         [Url]
         public string Url { get; set; }

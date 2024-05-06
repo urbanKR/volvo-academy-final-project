@@ -192,9 +192,7 @@ namespace NewsAggregationPlatform.Controllers
         public async Task<IActionResult> Aggregate()
         {
             var rssLink = "https://www.espn.com/espn/rss/soccer/news";
-            var category = await _categoryService.GetCategoryByNameAsync("Sport");
-            var source = await _sourceService.GetSourceByNameAsync("ESPN");
-            await _articleService.AggregateFromSourceAsync(rssLink, category.Id, source.Id);  
+            await _articleService.AggregateFromSourceAsync(rssLink, new CancellationToken());  
             
             return RedirectToAction("Index");
         }

@@ -1,21 +1,29 @@
 ﻿using HtmlAgilityPack;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using NewsAggregationPlatform.Data;
+using NewsAggregationPlatform.Data.CQS.CommandHandlers.Articles;
+using NewsAggregationPlatform.Data.CQS.Commands.Articles;
+using NewsAggregationPlatform.Data.CQS.Queries.Articles;
+using NewsAggregationPlatform.Data.CQS.QueryHandlers.Articles;
 using NewsAggregationPlatform.Models.Entities;
 using NewsAggregationPlatform.Services.Abstraction;
 using System.ServiceModel.Syndication;
 using System.Text;
 using System.Xml;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace NewsAggregationPlatform.Services.Implementation
 {
     public class ArticleService : IArticleService
     {
         private readonly AppDbContext _dbContext;
+        private readonly IMediator _mediator;
 
-        public ArticleService(AppDbContext dbContext)
+        public ArticleService(AppDbContext dbContext, IMediator mediator)
         {
             _dbContext = dbContext;
+            _mediator = mediator;
         }
         public async Task<IEnumerable<Article>> GetArticlesAsync()
         {
@@ -46,53 +54,33 @@ namespace NewsAggregationPlatform.Services.Implementation
             return changes > 0;
         }
 
-        public async Task AggregateFromSourceAsync(string rssLink, Guid categoryId, Guid sourceId)
+        public async Task AggregateFromSourceAsync(string rssLink, CancellationToken cancellationToken)
         {
             try
             {
                 var reader = XmlReader.Create(rssLink);
                 var feed = SyndicationFeed.Load(reader);
-                var existedArticles = await _dbContext.Articles.Select(a => a.Url).ToListAsync();
 
-                var articles = feed.Items
-                    .Skip(1)
-                    .Select(item =>
-                    {
-                        var linkElement = item.ElementExtensions.ReadElementExtensions<XmlElement>("link", "http://www.w3.org/2005/Atom").FirstOrDefault();
-                        DateTime publishDate;
-                        try
-                        {
-                            publishDate = item.PublishDate.UtcDateTime;
-                        }
-                        catch (XmlException)
-                        {
-                            publishDate = DateTime.UtcNow;
-                        }
-
-                        return new Article
-                        {
-                            Id = Guid.NewGuid(),
-                            Title = item.Title.Text,
-                            Description = item.Summary.Text,
-                            Url = item.Links.Skip(1).First().Uri.AbsoluteUri,
-                            PublishedDate = publishDate,
-                            BasePositivityLevel = 50,
-                            Thumbnail = item.Links.First().Uri.AbsoluteUri,
-                            SourceId = sourceId,
-                            CategoryId = categoryId
-                        };
-                    })
-                    .Where(a => !existedArticles.Contains(a.Url)).ToDictionary(a => a.Url, a => a);
-
-                foreach (var a in articles)
+                await _mediator.Send(new InitializeArticlesByRssDataCommand()
                 {
-                    var articleText = await GetArticleTextByUrl(a.Key);
-                    a.Value.Content = articleText;
+                    RssData = feed.Items
+                }, cancellationToken);
+
+                var articlesWithNoText = await _mediator.Send(
+                 new GetArticlesWithNoTextIdAndUrlQuery(),
+                 cancellationToken);
+
+                var data = new Dictionary<Guid, string>();
+                foreach (var article in articlesWithNoText)
+                {
+                    var text = await GetArticleTextByUrl(article.Value);
+                    data.Add(article.Key, text);
                 }
 
-                await _dbContext.Articles.AddRangeAsync(articles.Values);
-                await _dbContext.SaveChangesAsync();
-
+                await _mediator.Send(new AddTextToArticlesCommand()
+                {
+                    ArticleTexts = data
+                }, cancellationToken);
 
             }
             catch (Exception e)
@@ -100,7 +88,6 @@ namespace NewsAggregationPlatform.Services.Implementation
                 throw;
             }
         }
-
         private async Task<string> GetArticleTextByUrl(string url)
         {
             var web = new HtmlWeb();

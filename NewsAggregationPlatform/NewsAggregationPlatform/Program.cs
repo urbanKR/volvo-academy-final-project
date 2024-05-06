@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NewsAggregationPlatform.Data;
+using NewsAggregationPlatform.Data.CQS.Queries.Articles;
 using NewsAggregationPlatform.Models.Entities;
 using NewsAggregationPlatform.Services.Abstraction;
 using NewsAggregationPlatform.Services.Implementation;
@@ -33,6 +34,10 @@ namespace NewsAggregationPlatform
             builder.Services.AddControllersWithViews();
 
             builder.Services.AddRazorPages();
+
+            builder.Services.AddMediatR(cfg =>
+               cfg.RegisterServicesFromAssembly(
+                   typeof(GetArticlesWithNoTextIdAndUrlQuery).Assembly));
 
             var app = builder.Build();
 
