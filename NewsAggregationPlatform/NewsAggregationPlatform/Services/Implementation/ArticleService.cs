@@ -6,6 +6,7 @@ using NewsAggregationPlatform.Data.CQS.CommandHandlers.Articles;
 using NewsAggregationPlatform.Data.CQS.Commands.Articles;
 using NewsAggregationPlatform.Data.CQS.Queries.Articles;
 using NewsAggregationPlatform.Data.CQS.QueryHandlers.Articles;
+using NewsAggregationPlatform.Interfaces;
 using NewsAggregationPlatform.Models.Entities;
 using NewsAggregationPlatform.Services.Abstraction;
 using System.ServiceModel.Syndication;
@@ -19,11 +20,13 @@ namespace NewsAggregationPlatform.Services.Implementation
     {
         private readonly AppDbContext _dbContext;
         private readonly IMediator _mediator;
+        private readonly IEnumerable<IArticleSource> _articleSources;
 
-        public ArticleService(AppDbContext dbContext, IMediator mediator)
+        public ArticleService(AppDbContext dbContext, IMediator mediator, IEnumerable<IArticleSource> articleSources)
         {
             _dbContext = dbContext;
             _mediator = mediator;
+            _articleSources = articleSources;
         }
         public async Task<IEnumerable<Article>> GetArticlesAsync()
         {
@@ -54,63 +57,11 @@ namespace NewsAggregationPlatform.Services.Implementation
             return changes > 0;
         }
 
-        public async Task AggregateFromSourceAsync(string rssLink, CancellationToken cancellationToken)
+        public async Task AggregateFromSourcesAsync(CancellationToken cancellationToken)
         {
-            try
+            foreach (var source in _articleSources)
             {
-                var reader = XmlReader.Create(rssLink);
-                var feed = SyndicationFeed.Load(reader);
-
-                await _mediator.Send(new InitializeArticlesByRssDataCommand()
-                {
-                    RssData = feed.Items
-                }, cancellationToken);
-
-                var articlesWithNoText = await _mediator.Send(
-                 new GetArticlesWithNoTextIdAndUrlQuery(),
-                 cancellationToken);
-
-                var data = new Dictionary<Guid, string>();
-                foreach (var article in articlesWithNoText)
-                {
-                    var text = await GetArticleTextByUrl(article.Value);
-                    data.Add(article.Key, text);
-                }
-
-                await _mediator.Send(new AddTextToArticlesCommand()
-                {
-                    ArticleTexts = data
-                }, cancellationToken);
-
-            }
-            catch (Exception e)
-            {
-                throw;
-            }
-        }
-        private async Task<string> GetArticleTextByUrl(string url)
-        {
-            var web = new HtmlWeb();
-            var doc = await web.LoadFromWebAsync(url);
-            var articleBody = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'article-body')]");
-            if (articleBody != null)
-            {
-                var paragraphBuilder = new StringBuilder();
-                var paragraphs = articleBody.SelectNodes(".//p");
-
-                if (paragraphs != null)
-                {
-                    foreach (var paragraph in paragraphs)
-                    {
-                        paragraphBuilder.AppendLine(paragraph.InnerText);
-                    }
-                }
-
-                return paragraphBuilder.ToString();
-            }
-            else
-            {
-                return "";
+                await source.FetchArticlesAsync(cancellationToken);
             }
         }
     }

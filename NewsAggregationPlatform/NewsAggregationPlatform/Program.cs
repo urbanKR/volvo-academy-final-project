@@ -1,10 +1,13 @@
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NewsAggregationPlatform.Data;
 using NewsAggregationPlatform.Data.CQS.Queries.Articles;
+using NewsAggregationPlatform.Interfaces;
 using NewsAggregationPlatform.Models.Entities;
 using NewsAggregationPlatform.Services.Abstraction;
 using NewsAggregationPlatform.Services.Implementation;
+using NewsAggregationPlatform.Sources;
 
 namespace NewsAggregationPlatform
 {
@@ -38,6 +41,9 @@ namespace NewsAggregationPlatform
             builder.Services.AddMediatR(cfg =>
                cfg.RegisterServicesFromAssembly(
                    typeof(GetArticlesWithNoTextIdAndUrlQuery).Assembly));
+
+            
+            builder.Services.AddScoped<IArticleSource, ESPNRssArticleSource>();
 
             var app = builder.Build();
 
