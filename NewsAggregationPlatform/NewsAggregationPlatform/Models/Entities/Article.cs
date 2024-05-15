@@ -12,7 +12,7 @@ namespace NewsAggregationPlatform.Models.Entities
         [MaxLength(150)]
         public string Title { get; set; }
         [Required]
-        [MaxLength(700)]
+        [MaxLength(1200)]
         public string Description { get; set; }
         [MaxLength(10000)]
         public string? Content { get; set; }

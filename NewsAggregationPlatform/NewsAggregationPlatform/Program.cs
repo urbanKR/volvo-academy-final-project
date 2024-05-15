@@ -44,6 +44,7 @@ namespace NewsAggregationPlatform
 
             
             builder.Services.AddScoped<IArticleSource, ESPNRssArticleSource>();
+            builder.Services.AddScoped<IArticleSource, TheGuardianRssArticleSource>();
 
             var app = builder.Build();
 

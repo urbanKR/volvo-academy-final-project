@@ -27,7 +27,7 @@ namespace NewsAggregationPlatform.Sources
                 var reader = XmlReader.Create(rssLink);
                 var feed = SyndicationFeed.Load(reader);
 
-                await _mediator.Send(new InitializeArticlesByRssDataCommand()
+                await _mediator.Send(new InitializeArticlesByESPNRssDataCommand()
                 {
                     RssData = feed.Items
                 }, cancellationToken);
