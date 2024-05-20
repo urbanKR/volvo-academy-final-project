@@ -1,14 +1,11 @@
-﻿using MediatR;
+﻿using HtmlAgilityPack;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using NewsAggregationPlatform.Data.CQS.Commands.Articles;
 using NewsAggregationPlatform.Models.Entities;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using System.Xml;
-using NewsAggregationPlatform.Migrations;
-using System.Security.Policy;
-using Microsoft.IdentityModel.Tokens;
 using System.Xml.Linq;
-using HtmlAgilityPack;
 
 namespace NewsAggregationPlatform.Data.CQS.CommandHandlers.Articles
 {
@@ -32,7 +29,7 @@ namespace NewsAggregationPlatform.Data.CQS.CommandHandlers.Articles
                        htmlDoc.LoadHtml(item.Summary.Text);
                        var description = htmlDoc.DocumentNode.InnerText;
                        int maxDescriptionLength = 1200;
-                       if(description.Length > maxDescriptionLength)
+                       if (description.Length > maxDescriptionLength)
                        {
                            description = description.Substring(0, maxDescriptionLength - 3);
                            description += "...";

@@ -1,4 +1,3 @@
-using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NewsAggregationPlatform.Data;
@@ -42,9 +41,10 @@ namespace NewsAggregationPlatform
                cfg.RegisterServicesFromAssembly(
                    typeof(GetArticlesWithNoTextIdAndUrlQuery).Assembly));
 
-            
+
             builder.Services.AddScoped<IArticleSource, ESPNRssArticleSource>();
             builder.Services.AddScoped<IArticleSource, TheGuardianRssArticleSource>();
+            builder.Services.AddScoped<IArticleSource, TheVergeRssArticleSource>();
 
             var app = builder.Build();
 

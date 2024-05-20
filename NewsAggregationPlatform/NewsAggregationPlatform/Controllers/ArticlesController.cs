@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ServiceModel.Syndication;
-using System.Threading.Tasks;
-using System.Xml;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using NewsAggregationPlatform.Data;
 using NewsAggregationPlatform.Models.Entities;
 using NewsAggregationPlatform.Services.Abstraction;
-using NewsAggregationPlatform.Services.Implementation;
 
 namespace NewsAggregationPlatform.Controllers
 {
@@ -191,7 +183,7 @@ namespace NewsAggregationPlatform.Controllers
 
         public async Task<IActionResult> Aggregate()
         {
-            await _articleService.AggregateFromSourcesAsync(new CancellationToken());     
+            await _articleService.AggregateFromSourcesAsync(new CancellationToken());
             return RedirectToAction("Index");
         }
     }

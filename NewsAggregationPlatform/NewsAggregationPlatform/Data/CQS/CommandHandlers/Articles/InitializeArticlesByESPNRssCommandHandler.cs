@@ -51,7 +51,7 @@ namespace NewsAggregationPlatform.Data.CQS.CommandHandlers.Articles
                        };
                    })
                    .Where(a => !existedArticleLinks.Contains(a.Url) && !a.Url.IsNullOrEmpty()).ToList();
-                    
+
             await _dbContext.Articles.AddRangeAsync(articles, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
         }

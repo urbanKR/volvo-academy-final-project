@@ -1,10 +1,6 @@
-﻿using HtmlAgilityPack;
-using MediatR;
+﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using NewsAggregationPlatform.Data.CQS.Commands.Articles;
-using NewsAggregationPlatform.Models.Entities;
-using System.Text;
-using System.Xml;
 
 namespace NewsAggregationPlatform.Data.CQS.CommandHandlers.Articles
 {

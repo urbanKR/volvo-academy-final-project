@@ -9,16 +9,15 @@ using System.Xml;
 
 namespace NewsAggregationPlatform.Sources
 {
-    public class ESPNRssArticleSource : IArticleSource
+    public class TheVergeRssArticleSource : IArticleSource
     {
         private readonly IMediator _mediator;
-        private readonly string rssLink = "https://www.espn.com/espn/rss/soccer/news";
+        private readonly string rssLink = "https://www.theverge.com/rss/index.xml";
 
-        public ESPNRssArticleSource(IMediator mediator)
+        public TheVergeRssArticleSource(IMediator mediator)
         {
             _mediator = mediator;
         }
-
         public async Task FetchArticlesAsync(CancellationToken cancellationToken)
         {
             try
@@ -26,14 +25,14 @@ namespace NewsAggregationPlatform.Sources
                 var reader = XmlReader.Create(rssLink);
                 var feed = SyndicationFeed.Load(reader);
 
-                await _mediator.Send(new InitializeArticlesByESPNRssDataCommand()
+                await _mediator.Send(new InitializeArticlesByTheVergeRssDataCommand()
                 {
                     RssData = feed.Items
                 }, cancellationToken);
 
                 var articlesWithNoText = await _mediator.Send(
-                 new GetArticlesWithNoTextIdAndUrlQuery(),
-                 cancellationToken);
+                                    new GetTheVergeArticlesWithNoTextIdAndUrlQuery(),
+                                                    cancellationToken);
 
                 var data = new Dictionary<Guid, string>();
                 foreach (var article in articlesWithNoText)
@@ -53,31 +52,27 @@ namespace NewsAggregationPlatform.Sources
                 throw;
             }
         }
-
         private async Task<string> GetArticleTextByUrl(string url)
         {
-            var web = new HtmlWeb();
-            var doc = await web.LoadFromWebAsync(url);
-            var articleBody = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'article-body')]");
-            if (articleBody != null)
-            {
-                var paragraphBuilder = new StringBuilder();
-                var paragraphs = articleBody.SelectNodes(".//p");
+            var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.84 Safari/537.36");
+            var response = await httpClient.GetStringAsync(url);
 
-                if (paragraphs != null)
+            var doc = new HtmlDocument();
+            doc.LoadHtml(response);
+
+            var paragraphBuilder = new StringBuilder();
+            var paragraphs = doc.DocumentNode.SelectNodes("//p");
+
+            if (paragraphs != null)
+            {
+                foreach (var paragraph in paragraphs)
                 {
-                    foreach (var paragraph in paragraphs)
-                    {
-                        paragraphBuilder.AppendLine(paragraph.InnerText);
-                    }
+                    paragraphBuilder.AppendLine(paragraph.InnerText);
                 }
+            }
 
-                return paragraphBuilder.ToString();
-            }
-            else
-            {
-                return "";
-            }
+            return paragraphBuilder.ToString();
         }
     }
 }
