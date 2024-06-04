@@ -12,16 +12,19 @@ namespace NewsAggregationPlatform.Sources
     public class TheVergeRssArticleSource : IArticleSource
     {
         private readonly IMediator _mediator;
+        private readonly ILogger<TheVergeRssArticleSource> _logger;
         private readonly string rssLink = "https://www.theverge.com/rss/index.xml";
 
-        public TheVergeRssArticleSource(IMediator mediator)
+        public TheVergeRssArticleSource(IMediator mediator, ILogger<TheVergeRssArticleSource> logger)
         {
             _mediator = mediator;
+            _logger = logger;
         }
         public async Task FetchArticlesAsync(CancellationToken cancellationToken)
         {
             try
             {
+                _logger.LogInformation("Fetching articles from The Verge RSS feed");
                 var reader = XmlReader.Create(rssLink);
                 var feed = SyndicationFeed.Load(reader);
 
@@ -45,10 +48,12 @@ namespace NewsAggregationPlatform.Sources
                 {
                     ArticleTexts = data
                 }, cancellationToken);
+                _logger.LogInformation("Successfully fetched and processed articles from The Verge RSS feed");
 
             }
             catch (Exception e)
             {
+                _logger.LogError(e, "An error occurred while fetching or processing articles from The Verge RSS feed");
                 throw;
             }
         }

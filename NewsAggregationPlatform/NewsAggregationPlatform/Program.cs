@@ -7,6 +7,7 @@ using NewsAggregationPlatform.Models.Entities;
 using NewsAggregationPlatform.Services.Abstraction;
 using NewsAggregationPlatform.Services.Implementation;
 using NewsAggregationPlatform.Sources;
+using Serilog;
 
 namespace NewsAggregationPlatform
 {
@@ -28,6 +29,8 @@ namespace NewsAggregationPlatform
                 options.SignIn.RequireConfirmedEmail = false;
             })
             .AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders().AddDefaultUI();
+
+            builder.Host.UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration));
 
             builder.Services.AddScoped<IArticleService, ArticleService>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -58,6 +61,8 @@ namespace NewsAggregationPlatform
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            app.UseSerilogRequestLogging();
 
             app.UseRouting();
 

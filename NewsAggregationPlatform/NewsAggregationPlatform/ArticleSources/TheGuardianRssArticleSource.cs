@@ -12,16 +12,20 @@ namespace NewsAggregationPlatform.Sources
     public class TheGuardianRssArticleSource : IArticleSource
     {
         private readonly IMediator _mediator;
+        private readonly ILogger<TheGuardianRssArticleSource> _logger;
         private readonly string rssLink = "https://www.theguardian.com/world/rss";
 
-        public TheGuardianRssArticleSource(IMediator mediator)
+        public TheGuardianRssArticleSource(IMediator mediator, ILogger<TheGuardianRssArticleSource> logger)
         {
             _mediator = mediator;
+            _logger = logger;
         }
         public async Task FetchArticlesAsync(CancellationToken cancellationToken)
         {
             try
             {
+                _logger.LogInformation("Fetching articles from The Guardian RSS feed");
+
                 var reader = XmlReader.Create(rssLink);
                 var feed = SyndicationFeed.Load(reader);
 
@@ -45,10 +49,11 @@ namespace NewsAggregationPlatform.Sources
                 {
                     ArticleTexts = data
                 }, cancellationToken);
-
+                _logger.LogInformation("Successfully fetched and processed articles from The Guardian RSS feed");
             }
             catch (Exception e)
             {
+                _logger.LogError(e, "An error occurred while fetching or processing articles from The Guardian RSS feed");
                 throw;
             }
         }

@@ -12,17 +12,20 @@ namespace NewsAggregationPlatform.Sources
     public class ESPNRssArticleSource : IArticleSource
     {
         private readonly IMediator _mediator;
+        private readonly ILogger<ESPNRssArticleSource> _logger;
         private readonly string rssLink = "https://www.espn.com/espn/rss/soccer/news";
 
-        public ESPNRssArticleSource(IMediator mediator)
+        public ESPNRssArticleSource(IMediator mediator, ILogger<ESPNRssArticleSource> logger)
         {
             _mediator = mediator;
+            _logger = logger;
         }
 
         public async Task FetchArticlesAsync(CancellationToken cancellationToken)
         {
             try
             {
+                _logger.LogInformation("Fetching articles from ESPN RSS feed");
                 var reader = XmlReader.Create(rssLink);
                 var feed = SyndicationFeed.Load(reader);
 
@@ -46,10 +49,11 @@ namespace NewsAggregationPlatform.Sources
                 {
                     ArticleTexts = data
                 }, cancellationToken);
-
+                _logger.LogInformation("Successfully fetched and processed articles from ESPN RSS feed");
             }
             catch (Exception e)
             {
+                _logger.LogError(e, "An error occurred while fetching or processing articles from ESPN RSS feed");
                 throw;
             }
         }
@@ -76,6 +80,7 @@ namespace NewsAggregationPlatform.Sources
             }
             else
             {
+                _logger.LogWarning("No article body found for URL: {Url}", url);
                 return "";
             }
         }

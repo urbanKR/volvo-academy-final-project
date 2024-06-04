@@ -13,11 +13,13 @@ namespace NewsAggregationPlatform.Controllers
         private readonly IArticleService _articleService;
         private readonly ICategoryService _categoryService;
         private readonly ISourceService _sourceService;
-        public ArticlesController(IArticleService articleService, ICategoryService categoryService, ISourceService sourceService)
+        private readonly ILogger<ArticlesController> _logger;
+        public ArticlesController(IArticleService articleService, ICategoryService categoryService, ISourceService sourceService, ILogger<ArticlesController> logger)
         {
             _articleService = articleService;
             _categoryService = categoryService;
             _sourceService = sourceService;
+            _logger = logger;
         }
 
         public async Task<IActionResult> Index()
@@ -30,6 +32,7 @@ namespace NewsAggregationPlatform.Controllers
         {
             if (id == null)
             {
+                _logger.LogError("Article id is null in Details method");
                 return NotFound();
             }
 
@@ -37,6 +40,7 @@ namespace NewsAggregationPlatform.Controllers
 
             if (article == null)
             {
+                _logger.LogError("Article not found with id: {Id} in Details method", id.Value);
                 return NotFound();
             }
 
@@ -79,6 +83,7 @@ namespace NewsAggregationPlatform.Controllers
                 _articleService.AddArticle(article);
                 return RedirectToAction(nameof(Index));
             }
+            _logger.LogWarning("Invalid model state while creating article");
             return View(article);
         }
 
@@ -86,12 +91,14 @@ namespace NewsAggregationPlatform.Controllers
         {
             if (id == null)
             {
+                _logger.LogError("Article id is null in Edit method");
                 return NotFound();
             }
 
             Article article = await _articleService.GetArticleByIdAsync(id.Value);
             if (article == null)
             {
+                _logger.LogError("Article not found with id: {Id} in Edit method", id.Value);
                 return NotFound();
             }
             var categories = await _categoryService.GetCategoriesAsync();
@@ -118,6 +125,7 @@ namespace NewsAggregationPlatform.Controllers
         {
             if (id != article.Id)
             {
+                _logger.LogError("Mismatch between route id: {Id} and article id: {ArticleId} in Edit method", id, article.Id);
                 return NotFound();
             }
 
@@ -128,33 +136,37 @@ namespace NewsAggregationPlatform.Controllers
                     article.PublishedDate = DateTime.Now;
                     _articleService.UpdateArticle(article);
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateConcurrencyException e)
                 {
                     if (!ArticleExists(article.Id))
                     {
+                        _logger.LogError("Article not found with id: {Id} in Edit method", id);
                         return NotFound();
                     }
                     else
                     {
+                        _logger.LogError(e, "DbUpdateConcurrencyException for article with id: {Id} in Edit method", id);
                         throw;
                     }
                 }
                 return RedirectToAction(nameof(Index));
             }
+            _logger.LogWarning("Invalid model state while updating article with id: {Id}", id);
             return View(article);
-
         }
 
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null)
             {
+                _logger.LogError("Article id is null in Delete method");
                 return NotFound();
             }
 
             Article article = await _articleService.GetArticleByIdAsync(id.Value);
             if (article == null)
             {
+                _logger.LogError("Article not found with id: {Id} in Delete method", id.Value);
                 return NotFound();
             }
 
@@ -169,6 +181,11 @@ namespace NewsAggregationPlatform.Controllers
             if (article != null)
             {
                 _articleService.DeleteArticle(article);
+            }
+            else
+            {
+                _logger.LogError("Article not found with id: {Id} in DeleteConfirmed method", id);
+                return NotFound();
             }
             return RedirectToAction(nameof(Index));
         }
