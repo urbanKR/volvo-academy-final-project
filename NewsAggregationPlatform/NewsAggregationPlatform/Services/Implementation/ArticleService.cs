@@ -1,18 +1,9 @@
-﻿using HtmlAgilityPack;
-using MediatR;
+﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using NewsAggregationPlatform.Data;
-using NewsAggregationPlatform.Data.CQS.CommandHandlers.Articles;
-using NewsAggregationPlatform.Data.CQS.Commands.Articles;
-using NewsAggregationPlatform.Data.CQS.Queries.Articles;
-using NewsAggregationPlatform.Data.CQS.QueryHandlers.Articles;
 using NewsAggregationPlatform.Interfaces;
 using NewsAggregationPlatform.Models.Entities;
 using NewsAggregationPlatform.Services.Abstraction;
-using System.ServiceModel.Syndication;
-using System.Text;
-using System.Xml;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace NewsAggregationPlatform.Services.Implementation
 {
