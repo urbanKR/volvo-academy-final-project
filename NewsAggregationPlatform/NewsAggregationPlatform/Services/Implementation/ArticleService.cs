@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using NewsAggregationPlatform.Data;
 using NewsAggregationPlatform.Interfaces;
+using NewsAggregationPlatform.Models.DTOs.Article;
 using NewsAggregationPlatform.Models.Entities;
 using NewsAggregationPlatform.Services.Abstraction;
 
@@ -35,6 +36,26 @@ namespace NewsAggregationPlatform.Services.Implementation
         public bool UpdateArticle(Article article)
         {
             _dbContext.Articles.Update(article);
+            return Save();
+        }
+        public bool UpdateArticle(Guid id, UpdateArticleRequestDto dto)
+        {
+            var existingArticle = _dbContext.Articles.FirstOrDefault(a => a.Id == id);
+
+            if (existingArticle == null)
+            {
+                return false;
+            }
+
+            existingArticle.Title = dto.Title;
+            existingArticle.Description = dto.Description;
+            existingArticle.Content = dto.Content;
+            existingArticle.Url = dto.Url;
+            existingArticle.BasePositivityLevel = dto.BasePositivityLevel;
+            existingArticle.Thumbnail = dto.Thumbnail;
+            existingArticle.CategoryId = dto.CategoryId;
+            existingArticle.SourceId = dto.SourceId;
+
             return Save();
         }
         public bool DeleteArticle(Article article)

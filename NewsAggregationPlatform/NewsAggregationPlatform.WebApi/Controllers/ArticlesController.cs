@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NewsAggregationPlatform.Data;
 using NewsAggregationPlatform.Mappers;
 using NewsAggregationPlatform.Models.DTOs.Article;
+using NewsAggregationPlatform.Services.Abstraction;
 
 namespace NewsAggregationPlatform.WebApi.Controllers
 {
@@ -12,14 +12,18 @@ namespace NewsAggregationPlatform.WebApi.Controllers
     [ApiController]
     public class ArticlesController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IArticleService _articleService;
+        private readonly ISourceService _sourceService;
+        private readonly ICategoryService _categoryService;
+
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="context"></param>
-        public ArticlesController(AppDbContext context)
+        public ArticlesController(IArticleService articleService, ISourceService sourceService, ICategoryService categoryService)
         {
-            _context = context;
+            _articleService = articleService;
+            _sourceService = sourceService;
+            _categoryService = categoryService;
         }
         /// <summary>
         /// Get all articles
@@ -30,10 +34,11 @@ namespace NewsAggregationPlatform.WebApi.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<ArticleDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            var _articles = _context.Articles.ToList().Select(a => a.ToArticleDto());
-            return Ok(_articles);
+            var articles = await _articleService.GetArticlesAsync();
+            var articleDtos = articles.Select(a => a.ToArticleDto());
+            return Ok(articleDtos);
         }
         /// <summary>
         /// Get Article by id
@@ -45,9 +50,9 @@ namespace NewsAggregationPlatform.WebApi.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(ArticleDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult Get([FromRoute] Guid id)
+        public async Task<IActionResult> Get([FromRoute] Guid id)
         {
-            var article = _context.Articles.Find(id);
+            var article = await _articleService.GetArticleByIdAsync(id);
             if (article == null)
             {
                 return NotFound();
@@ -66,23 +71,23 @@ namespace NewsAggregationPlatform.WebApi.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult Create([FromBody] CreateArticleRequestDto articleDto)
+        public async Task<IActionResult> Create([FromBody] CreateArticleRequestDto articleDto)
         {
-            var sourceExists = _context.Sources.Any(s => s.Id == articleDto.SourceId);
-            var categoryExists = _context.Categories.Any(c => c.Id == articleDto.CategoryId);
+            var sourceExists = await _sourceService.GetSourceByIdAsync((Guid)articleDto.SourceId);
+            var categoryExists = await _categoryService.GetCategoryByIdAsync(articleDto.CategoryId);
 
-            if (!sourceExists)
+            if (sourceExists == null)
             {
                 return BadRequest("The provided SourceId does not exist.");
             }
 
-            if (!categoryExists)
+            if (categoryExists == null)
             {
                 return BadRequest("The provided CategoryId does not exist.");
             }
             var articleModel = articleDto.ToArticleFromCreateDto();
-            _context.Articles.Add(articleModel);
-            _context.SaveChanges();
+            _articleService.AddArticle(articleModel);
+
             return CreatedAtAction(nameof(Get), new { id = articleModel.Id }, articleModel.ToArticleDto());
         }
 
@@ -98,37 +103,29 @@ namespace NewsAggregationPlatform.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult Update([FromRoute] Guid id, [FromBody] UpdateArticleRequestDto dto)
+        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateArticleRequestDto dto)
         {
-            var articleModel = _context.Articles.FirstOrDefault(a => a.Id == id);
+            var articleModel = await _articleService.GetArticleByIdAsync(id);
 
             if (articleModel == null)
             {
                 return NotFound();
             }
 
-            var sourceExists = _context.Sources.Any(s => s.Id == dto.SourceId);
-            var categoryExists = _context.Categories.Any(c => c.Id == dto.CategoryId);
+            var source = await _sourceService.GetSourceByIdAsync((Guid)dto.SourceId);
+            var category = await _categoryService.GetCategoryByIdAsync(dto.CategoryId);
 
-            if (!sourceExists)
+            if (source == null)
             {
                 return BadRequest("The provided SourceId does not exist.");
             }
 
-            if (!categoryExists)
+            if (category == null)
             {
                 return BadRequest("The provided CategoryId does not exist.");
             }
-            articleModel.Title = dto.Title;
-            articleModel.Description = dto.Description;
-            articleModel.Content = dto.Content;
-            articleModel.Url = dto.Url;
-            articleModel.BasePositivityLevel = dto.BasePositivityLevel;
-            articleModel.Thumbnail = dto.Thumbnail;
-            articleModel.CategoryId = dto.CategoryId;
-            articleModel.SourceId = dto.SourceId;
 
-            _context.SaveChanges();
+            _articleService.UpdateArticle(articleModel.Id, dto);
 
             return Ok(articleModel.ToArticleDto());
         }
@@ -143,15 +140,14 @@ namespace NewsAggregationPlatform.WebApi.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult Delete([FromRoute] Guid id)
+        public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            var articleModel = _context.Articles.FirstOrDefault(a => a.Id.Equals(id));
+            var articleModel = await _articleService.GetArticleByIdAsync(id);
             if (articleModel == null)
             {
                 return NotFound();
             }
-            _context.Articles.Remove(articleModel);
-            _context.SaveChanges();
+            _articleService.DeleteArticle(articleModel);
 
             return NoContent();
         }

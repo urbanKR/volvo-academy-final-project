@@ -1,7 +1,9 @@
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using NewsAggregationPlatform.Data;
+using NewsAggregationPlatform.Data.CQS.Queries.Articles;
+using NewsAggregationPlatform.Services.Abstraction;
+using NewsAggregationPlatform.Services.Implementation;
 using System.Reflection;
 
 namespace NewsAggregationPlatform.WebApi
@@ -16,6 +18,10 @@ namespace NewsAggregationPlatform.WebApi
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
             builder.Services.AddDbContext<AppDbContext>(options =>
                            options.UseSqlServer(connectionString));
+
+            builder.Services.AddScoped<IArticleService, ArticleService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<ISourceService, SourceService>();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -33,6 +39,10 @@ namespace NewsAggregationPlatform.WebApi
                 var xmlName = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 opt.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlName));
             });
+
+            builder.Services.AddMediatR(cfg =>
+               cfg.RegisterServicesFromAssembly(
+                   typeof(GetArticlesWithNoTextIdAndUrlQuery).Assembly));
 
             var app = builder.Build();
 

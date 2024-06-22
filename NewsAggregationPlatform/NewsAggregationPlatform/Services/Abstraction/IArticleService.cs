@@ -1,4 +1,5 @@
-﻿using NewsAggregationPlatform.Models.Entities;
+﻿using NewsAggregationPlatform.Models.DTOs.Article;
+using NewsAggregationPlatform.Models.Entities;
 
 namespace NewsAggregationPlatform.Services.Abstraction
 {
@@ -8,6 +9,7 @@ namespace NewsAggregationPlatform.Services.Abstraction
         Task<Article> GetArticleByIdAsync(Guid id);
         bool AddArticle(Article article);
         bool UpdateArticle(Article article);
+        bool UpdateArticle(Guid id, UpdateArticleRequestDto dto);
         bool DeleteArticle(Article article);
         bool Save();
         Task AggregateFromSourcesAsync(CancellationToken cancellationToken);
