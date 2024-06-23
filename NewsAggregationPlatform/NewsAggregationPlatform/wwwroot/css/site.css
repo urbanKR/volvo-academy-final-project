@@ -20,3 +20,73 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.main-container {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.card .card-img-top {
+    max-width: 300px;
+    max-height: 300px;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+    padding: 20px;
+    padding: 0px;
+    margin: 0px;
+}
+
+.container .row .col .card {
+    border-radius: 30px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    margin: 0 auto;
+    float: none;
+    margin-bottom: 10px;
+    transition: all 0.28s;
+    width: 350px;
+    height: 500px;
+}
+
+.card .card-body {
+    padding: 25px;
+    margin-top: -15px;
+}
+
+.card-body .btn-primary {
+    border-radius: 500px;
+    width: 120px;
+}
+
+.container .row .col .card:hover {
+    transform: scale(1.06);
+}
+
+.card .card-title {
+    margin-bottom: 0;
+}
+
+.card .card-title::after {
+        content: "";
+        width: inherit;
+        background: black;
+        height: 1.5px;
+        display: block;
+        margin-top: 3px;
+}
+
+.truncate-multiline {
+    display: -webkit-box;
+    -webkit-line-clamp: 5; 
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+}
+
+.btn-read-more {
+    color: black;
+}

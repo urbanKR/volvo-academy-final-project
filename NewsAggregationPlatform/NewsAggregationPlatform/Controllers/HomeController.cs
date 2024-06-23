@@ -1,21 +1,28 @@
 using Microsoft.AspNetCore.Mvc;
 using NewsAggregationPlatform.Models;
+using NewsAggregationPlatform.Models.Entities;
+using NewsAggregationPlatform.Services.Abstraction;
 using System.Diagnostics;
 
 namespace NewsAggregationPlatform.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        private readonly IArticleService _articleService;
+        private readonly ICategoryService _categoryService;
+        private readonly ISourceService _sourceService;
+        private readonly ILogger<ArticlesController> _logger;
+        public HomeController(IArticleService articleService, ICategoryService categoryService, ISourceService sourceService, ILogger<ArticlesController> logger)
         {
+            _articleService = articleService;
+            _categoryService = categoryService;
+            _sourceService = sourceService;
             _logger = logger;
         }
-
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            IEnumerable<Article> articles = await _articleService.GetArticlesAsync();
+            return View(articles);
         }
 
         public IActionResult Privacy()
