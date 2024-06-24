@@ -1,0 +1,32 @@
+﻿@using NewsAggregationPlatform.Models.Entities
+@model Article
+
+@{
+    ViewData["Title"] = "Article Details";
+}
+
+<div class="container py-5 custom-details-container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <img src="@(string.IsNullOrEmpty(Model.Thumbnail) ? Url.Content("~/img/news-img-placeholder.jpg") : Model.Thumbnail)" class="card-img-top" alt="Article Image" />
+                <div class="card-body">
+                    <h2 class="card-title text-center">@Model.Title</h2>
+                    <div class="text-muted text-center mb-4">
+                        <p>
+                            @Model.PublishedDate.ToString() 
+                            @if (!string.IsNullOrEmpty(Model.User?.UserName))
+                            {
+                                <span> by @Model.User?.UserName</span>
+                            }
+                        </p>
+                        <p>Category: @Model.Category?.Name | Source: @Model.Source?.Name | Positivity Level: @Model.BasePositivityLevel</p>
+                    </div>
+                    <p class="card-text">@Model.Content</p>
+                    <a href="@Model.Url" target="_blank" class="btn btn-primary btn-read-more">Go to Source</a>
+                    <a asp-action="Index" class="btn btn-secondary btn-back-to-list">Back to List</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

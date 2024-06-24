@@ -25,9 +25,23 @@ namespace NewsAggregationPlatform.Controllers
             return View(articles);
         }
 
-        public IActionResult Privacy()
+        public async Task<IActionResult> Details(Guid? id)
         {
-            return View();
+            if (id == null)
+            {
+                _logger.LogError("Article id is null in Details method");
+                return NotFound();
+            }
+
+            Article article = await _articleService.GetArticleByIdAsync(id.Value);
+
+            if (article == null)
+            {
+                _logger.LogError("Article not found with id: {Id} in Details method", id.Value);
+                return NotFound();
+            }
+
+            return View(article);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

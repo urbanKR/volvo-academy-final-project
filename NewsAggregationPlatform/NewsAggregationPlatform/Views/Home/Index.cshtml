@@ -14,7 +14,7 @@
                     <div class="card-body">
                         <h5 class="card-title truncate-multiline">@article.Title</h5>
                         <p class="card-text truncate-multiline">@article.Description</p>
-                        <a href="@article.Url" class="btn btn-primary btn-read-more">Read More</a>
+                        <a asp-action="Details" asp-route-id="@article.Id" class="btn btn-primary btn-read-more">Read More</a>
                     </div>
                 </div>
             </div>
