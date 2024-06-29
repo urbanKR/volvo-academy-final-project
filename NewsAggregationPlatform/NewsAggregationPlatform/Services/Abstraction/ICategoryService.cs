@@ -1,4 +1,5 @@
-﻿using NewsAggregationPlatform.Models.Entities;
+﻿using NewsAggregationPlatform.Models.DTOs.Category;
+using NewsAggregationPlatform.Models.Entities;
 
 namespace NewsAggregationPlatform.Services.Abstraction
 {
@@ -9,6 +10,7 @@ namespace NewsAggregationPlatform.Services.Abstraction
         Task<Category> GetCategoryByNameAsync(String name);
         bool AddCategory(Category category);
         bool UpdateCategory(Category category);
+        bool UpdateCategory(Guid id, UpdateCategoryRequestDto dto);
         bool DeleteCategory(Category category);
         bool Save();
     }

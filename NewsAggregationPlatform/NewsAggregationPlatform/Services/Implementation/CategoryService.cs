@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NewsAggregationPlatform.Data;
+using NewsAggregationPlatform.Models.DTOs.Category;
 using NewsAggregationPlatform.Models.Entities;
 using NewsAggregationPlatform.Services.Abstraction;
 
@@ -33,6 +34,19 @@ namespace NewsAggregationPlatform.Services.Implementation
         public bool UpdateCategory(Category category)
         {
             _dbContext.Categories.Update(category);
+            return Save();
+        }
+        public bool UpdateCategory(Guid id, UpdateCategoryRequestDto dto)
+        {
+            var existingCategory = _dbContext.Categories.FirstOrDefault(a => a.Id == id);
+
+            if (existingCategory == null)
+            {
+                return false;
+            }
+
+            existingCategory.Name = dto.Name;
+
             return Save();
         }
         public bool DeleteCategory(Category category)
