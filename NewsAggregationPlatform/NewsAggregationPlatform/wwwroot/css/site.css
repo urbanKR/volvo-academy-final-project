@@ -203,3 +203,31 @@ body {
         width: 100%;
     }
 }
+
+/* Article Register/Login/etc Forms */
+
+.field-validation-error,
+.validation-summary-errors {
+    color: white !important; 
+}
+.custom-form-btn {
+    background: #00B4D8;
+    border: none;
+}
+
+.custom-form-btn:hover {
+        background: #09a8c8;
+}
+
+.nav-link.active {
+    background-color: #03045E !important;
+}
+
+.custom-form-btn-secondary {
+    background: #CAF0F8;
+    border: none;
+}
+
+.custom-form-btn-secondary:hover {
+        background: #09a8c8;
+}
