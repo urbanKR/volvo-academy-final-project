@@ -14,7 +14,7 @@ namespace NewsAggregationPlatform.Controllers
         private readonly ICategoryService _categoryService;
         private readonly ISourceService _sourceService;
         private readonly ILogger<ArticlesController> _logger;
-        public ArticlesController(IArticleService articleService, ICategoryService categoryService, ISourceService sourceService, ILogger<ArticlesController> logger)
+        public ArticlesController(IArticleService articleService, ICategoryService categoryService, ISourceService sourceService, ILogger<ArticlesController> logger, IPositivityAnalysisService positivityAnalysisService)
         {
             _articleService = articleService;
             _categoryService = categoryService;
@@ -201,6 +201,12 @@ namespace NewsAggregationPlatform.Controllers
         public async Task<IActionResult> Aggregate()
         {
             await _articleService.AggregateFromSourcesAsync(new CancellationToken());
+            return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> AnalyzePositivity()
+        {
+            await _articleService.AnalyzeAndUpdateArticlePositivityAsync(new CancellationToken());
             return RedirectToAction("Index");
         }
     }

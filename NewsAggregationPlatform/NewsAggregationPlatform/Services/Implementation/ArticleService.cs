@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using NewsAggregationPlatform.Data;
+using NewsAggregationPlatform.Data.CQS.Commands.Articles;
 using NewsAggregationPlatform.Interfaces;
 using NewsAggregationPlatform.Models.DTOs.Article;
 using NewsAggregationPlatform.Models.Entities;
@@ -13,12 +14,14 @@ namespace NewsAggregationPlatform.Services.Implementation
         private readonly AppDbContext _dbContext;
         private readonly IMediator _mediator;
         private readonly IEnumerable<IArticleSource> _articleSources;
+        private readonly IPositivityAnalysisService _positivityAnalysisService;
 
-        public ArticleService(AppDbContext dbContext, IMediator mediator, IEnumerable<IArticleSource> articleSources)
+        public ArticleService(AppDbContext dbContext, IMediator mediator, IEnumerable<IArticleSource> articleSources, IPositivityAnalysisService positivityAnalysisService)
         {
             _dbContext = dbContext;
             _mediator = mediator;
             _articleSources = articleSources;
+            _positivityAnalysisService = positivityAnalysisService;
         }
         public async Task<IEnumerable<Article>> GetArticlesAsync()
         {
@@ -75,6 +78,10 @@ namespace NewsAggregationPlatform.Services.Implementation
             {
                 await source.FetchArticlesAsync(cancellationToken);
             }
+        }
+        public async Task AnalyzeAndUpdateArticlePositivityAsync(CancellationToken cancellationToken)
+        {
+            await _mediator.Send(new AnalyzeAndUpdateArticlePositivityCommand(), cancellationToken);
         }
     }
 }

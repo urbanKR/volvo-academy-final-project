@@ -13,5 +13,6 @@ namespace NewsAggregationPlatform.Services.Abstraction
         bool DeleteArticle(Article article);
         bool Save();
         Task AggregateFromSourcesAsync(CancellationToken cancellationToken);
+        Task AnalyzeAndUpdateArticlePositivityAsync(CancellationToken cancellationToken);
     }
 }

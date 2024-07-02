@@ -10,9 +10,15 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<p>
-    <a asp-action="Aggregate" class="btn btn-danger">Aggregate News</a>
-</p>
+<div class="d-flex">
+    <p>
+        <a asp-action="Aggregate" class="btn btn-danger me-2">Aggregate News</a>
+    </p>
+    <p>
+        <a asp-action="AnalyzePositivity" class="btn btn-warning">Analyze News Positivity</a>
+    </p>
+</div>
+
 <table class="table">
     <thead>
         <tr>

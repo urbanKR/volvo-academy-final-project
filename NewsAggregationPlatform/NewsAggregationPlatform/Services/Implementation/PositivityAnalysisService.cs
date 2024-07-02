@@ -24,6 +24,8 @@ namespace NewsAggregationPlatform.Services.Implementation
             var predictionFunction = _mlContext.Model.CreatePredictionEngine<SentimentData, SentimentPrediction>(_model);
             var sentiment = new SentimentData { SentimentText = content };
             var predictionResult = predictionFunction.Predict(sentiment);
+            predictionResult.Score = predictionResult.Probability * 100;
+
             return predictionResult;
         }
 
