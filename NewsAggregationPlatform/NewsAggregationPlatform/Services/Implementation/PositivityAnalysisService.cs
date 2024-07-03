@@ -14,7 +14,7 @@ namespace NewsAggregationPlatform.Services.Implementation
         public PositivityAnalysisService(IWebHostEnvironment env)
         {
             _mlContext = new MLContext();
-            _yelpDataPath = Path.Combine(env.ContentRootPath, "Data", "yelp_labelled.txt");
+            _yelpDataPath = Path.Combine(GetSolutionPath(env.ContentRootPath), "NewsAggregationPlatform", "Data", "yelp_labelled.txt");
             var trainTestData = LoadData(_mlContext);
             _model = BuildAndTrainModel(_mlContext, trainTestData.TrainSet);
         }
@@ -46,6 +46,21 @@ namespace NewsAggregationPlatform.Services.Implementation
             var model = predictor.Fit(splitTrainSet);
 
             return model;
+        }
+        private string GetSolutionPath(string contentRootPath)
+        {
+            DirectoryInfo directoryInfo = new DirectoryInfo(contentRootPath);
+            while (directoryInfo != null && !directoryInfo.GetFiles("*.sln").Any())
+            {
+                directoryInfo = directoryInfo.Parent;
+            }
+
+            if (directoryInfo == null)
+            {
+                throw new InvalidOperationException("Solution directory not found.");
+            }
+
+            return directoryInfo.FullName;
         }
     }
 }
