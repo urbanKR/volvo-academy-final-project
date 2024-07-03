@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using NewsAggregationPlatform.Models;
 using NewsAggregationPlatform.Models.Entities;
 using NewsAggregationPlatform.Services.Abstraction;
@@ -19,9 +20,34 @@ namespace NewsAggregationPlatform.Controllers
             _sourceService = sourceService;
             _logger = logger;
         }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(Guid? categoryId, Guid? sourceId, double? positivityLevel)
         {
+            int? minPositivityLevelVal = TempData["PositivityLevel"] as int?;
+            if (minPositivityLevelVal == null)
+            {
+                minPositivityLevelVal = 0;
+            }
             IEnumerable<Article> articles = await _articleService.GetArticlesAsync();
+            articles = articles.Where(a => a.BasePositivityLevel >= minPositivityLevelVal.Value);
+
+            if (categoryId.HasValue)
+            {
+                articles = articles.Where(a => a.CategoryId == categoryId.Value);
+            }
+
+            if (sourceId.HasValue)
+            {
+                articles = articles.Where(a => a.SourceId == sourceId.Value);
+            }
+
+            if (positivityLevel.HasValue)
+            {
+                articles = articles.Where(a => a.BasePositivityLevel >= positivityLevel.Value);
+            }
+
+            ViewData["Categories"] = new SelectList(await _categoryService.GetCategoriesAsync(), "Id", "Name");
+            ViewData["Sources"] = new SelectList(await _sourceService.GetSourcesAsync(), "Id", "Name");
+
             return View(articles);
         }
 
@@ -48,6 +74,13 @@ namespace NewsAggregationPlatform.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        [HttpPost]
+        public IActionResult SetPositivityLevel(int positivityLevel)
+        {
+            TempData["PositivityLevel"] = positivityLevel;
+            return RedirectToAction("Index");
         }
     }
 }

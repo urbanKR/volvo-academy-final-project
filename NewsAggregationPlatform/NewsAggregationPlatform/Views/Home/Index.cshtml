@@ -5,6 +5,16 @@
 }
 
 <div class="container py-5">
+    <form method="get" class="form-inline mb-3  mt-5">
+        <select class="form-control mr-2 mt-1" asp-items="ViewBag.Categories as SelectList" name="categoryId">
+            <option value="">All Categories</option>
+        </select>
+        <select class="form-control mr-2 mt-1" asp-items="ViewBag.Sources as SelectList" name="sourceId">
+            <option value="">All Sources</option>
+        </select>
+        <input type="number" class="form-control mr-2 mt-1" name="positivityLevel" placeholder="Min Positivity Level" step="0.01" />
+        <button type="submit" class="btn btn-primary custom-form-btn mt-2">Apply</button>
+    </form>
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 py-5">
         @foreach (var article in Model)
         {

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using NewsAggregationPlatform.Data;
 using NewsAggregationPlatform.Interfaces;
 using NewsAggregationPlatform.Models.Entities;
+using NewsAggregationPlatform.Services.Abstraction;
 using NewsAggregationPlatform.Services.Implementation;
 using NSubstitute;
 
@@ -15,6 +16,7 @@ namespace NewsAggregationPlatform.Tests
         private readonly ArticleService _articleService;
         private readonly IMediator _mediator = Substitute.For<IMediator>();
         private readonly IEnumerable<IArticleSource> _articleSources = Substitute.For<IEnumerable<IArticleSource>>();
+        private readonly IPositivityAnalysisService _positivityAnalysisService = Substitute.For<IPositivityAnalysisService>();
 
         public ArticleServiceTests()
         {
@@ -22,7 +24,7 @@ namespace NewsAggregationPlatform.Tests
                 .UseInMemoryDatabase(databaseName: "TestDb")
                 .Options;
             _dbContext = new AppDbContext(options);
-            _articleService = new ArticleService(_dbContext, _mediator, _articleSources);
+            _articleService = new ArticleService(_dbContext, _mediator, _articleSources, _positivityAnalysisService);
         }
 
         [Fact]
