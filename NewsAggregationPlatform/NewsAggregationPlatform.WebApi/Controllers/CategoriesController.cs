@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NewsAggregationPlatform.Mappers;
 using NewsAggregationPlatform.Models.DTOs.Category;
 using NewsAggregationPlatform.Services.Abstraction;
@@ -10,6 +11,7 @@ namespace NewsAggregationPlatform.WebApi.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CategoriesController : ControllerBase
     {
         private readonly ICategoryService _categoryService;

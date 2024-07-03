@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NewsAggregationPlatform.Mappers;
 using NewsAggregationPlatform.Models.DTOs.Article;
 using NewsAggregationPlatform.Services.Abstraction;
@@ -10,6 +11,7 @@ namespace NewsAggregationPlatform.WebApi.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ArticlesController : ControllerBase
     {
         private readonly IArticleService _articleService;
